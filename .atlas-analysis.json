@@ -1,0 +1,189 @@
+{
+  "projectType": "framework",
+  "projectName": "Maizzle",
+  "projectDescription": "A framework for rapidly building HTML emails with Tailwind CSS and advanced email-specific post-processing.",
+  "theme": "aspen",
+  "primaryColor": "#3b82f6",
+  "lightColor": "#60a5fa",
+  "darkColor": "#2563eb",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "editor-setup",
+              "compatibility"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/environments",
+              "concepts/tailwindcss",
+              "concepts/build-process"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/css",
+              "configuration/build",
+              "configuration/server",
+              "configuration/components",
+              "configuration/expressions",
+              "configuration/posthtml",
+              "configuration/postcss"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "development/layouts",
+              "development/templates",
+              "development/components",
+              "development/expressions",
+              "development/tags",
+              "development/assets",
+              "development/events",
+              "development/functions",
+              "development/markdown",
+              "development/plaintext"
+            ]
+          },
+          {
+            "group": "Transformers",
+            "pages": [
+              "transformers/overview",
+              "transformers/filters",
+              "transformers/inline-css",
+              "transformers/safe-class-names",
+              "transformers/purge-css",
+              "transformers/shorthand-css",
+              "transformers/attribute-to-style",
+              "transformers/remove-attributes",
+              "transformers/add-attributes",
+              "transformers/replace-strings",
+              "transformers/widows",
+              "transformers/url-parameters",
+              "transformers/base-url",
+              "transformers/six-hex",
+              "transformers/prettify",
+              "transformers/minify"
+            ]
+          },
+          {
+            "group": "Components",
+            "pages": [
+              "components/spacer",
+              "components/divider",
+              "components/button",
+              "components/vml"
+            ]
+          },
+          {
+            "group": "Examples",
+            "pages": [
+              "examples/spacers",
+              "examples/dividers",
+              "examples/buttons",
+              "examples/cards",
+              "examples/grids",
+              "examples/google-fonts",
+              "examples/reverse-stack"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI & API",
+        "groups": [
+          {
+            "group": "CLI Tool",
+            "pages": [
+              "cli/overview",
+              "cli/commands",
+              "cli/options"
+            ]
+          },
+          {
+            "group": "API Reference",
+            "pages": [
+              "api/overview",
+              "api/render",
+              "api/configuration"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Tutorials",
+            "pages": [
+              "guides/amp-email",
+              "guides/custom-fonts",
+              "guides/gradients",
+              "guides/markdown-emails",
+              "guides/rss-feed",
+              "guides/syntax-highlighting-prismjs",
+              "guides/wordpress-api",
+              "guides/mailchimp-package"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Resources",
+        "groups": [
+          {
+            "group": "Additional Resources",
+            "pages": [
+              "resources/templates",
+              "resources/upgrade-guide",
+              "resources/glossary"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Tailwind CSS integration for rapid email development",
+    "PostHTML-based templating with components and expressions",
+    "Email-specific CSS transformers (inlining, purging, shorthand)",
+    "CLI tool for scaffolding and building projects",
+    "Programmatic API for rendering emails",
+    "Multiple build environments with JavaScript configuration",
+    "Markdown support with GitHub Flavored Markdown",
+    "VML component support for Outlook compatibility"
+  ],
+  "publicApiSurface": [
+    "render(html, options)",
+    "maizzle new",
+    "maizzle serve [env]",
+    "maizzle build [env]",
+    "maizzle make:config [env]",
+    "maizzle make:layout [name]",
+    "maizzle make:template [name]",
+    "css.inline",
+    "css.purge",
+    "css.shorthand",
+    "css.tailwind",
+    "transformers.filters",
+    "transformers.widows",
+    "transformers.baseURL",
+    "components.root",
+    "components.tag",
+    "expressions.delimiters",
+    "build.output",
+    "build.templates",
+    "events.beforeCreate",
+    "events.afterBuild"
+  ]
+}
