@@ -1,0 +1,125 @@
+---
+title: CLI options
+description: Command-line options and flags for Maizzle CLI commands
+---
+
+# CLI options
+
+Global options and flags available for Maizzle CLI commands.
+
+## Global options
+
+These options are available for multiple CLI commands.
+
+### --bin
+
+Specify the path to Maizzle's executable.
+
+**Short:** `-b`
+
+**Available in:** `serve`, `build`
+
+**Example:**
+
+```sh
+maizzle serve --bin /path/to/@maizzle/framework/src
+```
+
+This is useful when you need to use a custom version of Maizzle.
+
+### --config
+
+Specify the path to a config file to use.
+
+**Short:** `-c`
+
+**Available in:** `serve`, `build`
+
+**Example:**
+
+```sh
+maizzle build --config /path/to/custom-config.js
+```
+
+<Note>
+The config file path takes precedence over the `[env]` argument. For example, if you run `maizzle serve production --config /path/to/dev.config.js`, the `dev.config.js` file will be used even though `production` is passed.
+</Note>
+
+## serve options
+
+Options specific to the `serve` command.
+
+### --port
+
+Specify a port number to run the server on.
+
+**Short:** `-p`
+
+**Default:** `3000`
+
+**Example:**
+
+```sh
+maizzle serve --port 8080
+```
+
+By default, `maizzle serve` will start on port `3000`.
+
+## build options
+
+Options specific to the `build` command.
+
+### --summary
+
+Show a summary of the build process with file sizes and build times.
+
+**Short:** `-s`
+
+**Example:**
+
+```sh
+maizzle build production --summary
+```
+
+This will output a table showing:
+
+- File name
+- Compiled file size
+- Build time for each template
+- Total build time
+
+**Example output:**
+
+```md
+┌────────────────────────┬───────────┬────────────┐
+│ File name              │ File size │ Build time │
+├────────────────────────┼───────────┼────────────┤
+│ confirmation.html      │ 5.07 KB   │ 432 ms     │
+├────────────────────────┼───────────┼────────────┤
+│ email-change.html      │ 5.07 KB   │ 79 ms      │
+├────────────────────────┼───────────┼────────────┤
+│ invitation.html        │ 5.08 KB   │ 81 ms      │
+├────────────────────────┼───────────┼────────────┤
+│ password-recovery.html │ 4.99 KB   │ 65 ms      │
+└────────────────────────┴───────────┴────────────┘
+
+✔ Built 4 templates in 698 ms
+```
+
+## make:config options
+
+Options specific to the `make:config` command.
+
+### --full
+
+Scaffold a full config instead of a minimal one.
+
+**Short:** `-f`
+
+**Example:**
+
+```sh
+maizzle make:config preview --full
+```
+
+By default, a minimal config will be output. Use `--full` to generate a config file with all available options.

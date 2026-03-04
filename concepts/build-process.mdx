@@ -1,0 +1,170 @@
+---
+title: Build process
+description: See how the build process works and how Maizzle builds your emails.
+---
+
+When you run `maizzle build`, your Templates go through a series of events that compile them to plain HTML and apply various, email-specific transformations.
+
+To get a better understanding of how Maizzle builds your emails, here's a step-by-step guide of what's going on under the hood.
+
+## Environment config
+
+First, a global configuration object is computed by merging your Environment config on top of the base `config.js`.
+
+For example, running `maizzle build production` will tell Maizzle to look for the `config.production.js` file at your current location, and merge it on top of `config.js`.
+
+When running `maizzle build` or `maizzle serve`, only the base `config.js` will be used.
+
+## beforeCreate()
+
+The [beforeCreate](/development/events#beforecreate) event (CLI-only) is triggered, giving you access to the config before Maizzle loops over your Templates to compile them.
+
+## Clean destination
+
+The destination directories that you have defined under `build.output.path` in your environment config are deleted.
+
+<Warning>Be careful when customizing this path, so you don't end up deleting important directories and files on your machine.</Warning>
+
+## Compile templates
+
+Each Template file is parsed and compiled:
+
+<Steps>
+  <Step title="Read template file">
+    Maizzle reads the Template file
+  </Step>
+  
+  <Step title="Extract Front Matter">
+    It extracts its Front Matter
+  </Step>
+  
+  <Step title="Compute config">
+    A unique Template `config` is computed by merging the Template's Front Matter keys with the Environment `config`
+  </Step>
+  
+  <Step title="beforeRender() event">
+    [beforeRender()](/development/events#beforerender) event is triggered
+  </Step>
+  
+  <Step title="Render HTML">
+    The HTML is rendered with PostHTML
+    
+    Your Environment name and all `config` options (including any you defined in Front Matter) are exposed under the `page` object, which you can access through [expressions](/development/expressions).
+    
+    PostHTML plugins that are used as part of the rendering process:
+    - envTags - core plugin that enables [`<env:?>`](/development/tags#env) tags
+    - envAttributes - core plugin that enables attributes like `src-{env}`
+    - expandLinkTags - core plugin that expands local [`<link>` tags](/development/layouts#link-tag) into `<style>` tags
+    - postcssPlugin - this is where the Tailwind CSS magic happens
+    - fetchPlugin - enables the [`<fetch>`](/development/tags#fetch) tag
+    - [`posthtml-component`](https://github.com/posthtml/posthtml-components) - the PostHTML plugin that powers Maizzle's components
+  </Step>
+  
+  <Step title="afterRender() event">
+    [afterRender()](/development/events#afterrender) event is triggered
+  </Step>
+</Steps>
+
+## Transformers
+
+The compiled HTML is now passed on to a series of Transformers. Most of them are enabled by default, but some need to be explicitly enabled in your `config.js`.
+
+The order in which they're executed is exactly as follows:
+
+<Steps>
+  <Step title="coreTransformers">
+    Remove `<plaintext>` tags when developing locally, enable `no-inline` attribute for `<style>` tags
+  </Step>
+  
+  <Step title="safeClassNames">
+    [safeClassNames](/transformers/safe-class-names) - escaped characters in `<head>` and `<body>` CSS classes are replaced with email-safe alternatives
+  </Step>
+  
+  <Step title="filters">
+    [filters](/transformers/filters) - Liquid-like filters are applied to the HTML
+  </Step>
+  
+  <Step title="markdown">
+    [markdown](/development/markdown) is compiled
+  </Step>
+  
+  <Step title="widowWords">
+    [widowWords](/transformers/widows) - widow words are prevented in tags with the `prevent-widows` attribute
+  </Step>
+  
+  <Step title="attributeToStyle">
+    [attributeToStyle](/transformers/inline-css#attributetostyle) - translates HTML attributes to inline CSS
+  </Step>
+  
+  <Step title="inlineCSS">
+    [inlineCSS](/transformers/inline-css) - CSS is inlined
+  </Step>
+  
+  <Step title="removeAttributes">
+    [removeAttributes](/transformers/remove-attributes) - HTML attribute removal based on your config
+  </Step>
+  
+  <Step title="shorthandCSS">
+    shorthandCSS - longhand CSS in `style` attributes is converted to shorthand-form
+  </Step>
+  
+  <Step title="addAttributes">
+    [addAttributes](/transformers/add-attributes) - user-configured attributes are added to tags
+  </Step>
+  
+  <Step title="baseURL">
+    [baseURL](/transformers/base-url) - a base URL is prepended to configured attribute values
+  </Step>
+  
+  <Step title="urlParameters">
+    [urlParameters](/transformers/url-parameters) - configured parameters are added to URLs
+  </Step>
+  
+  <Step title="sixHex">
+    [sixHex](/transformers/six-hex) - ensures six digit HEX color codes are used in `bgcolor` and `color` attributes
+  </Step>
+  
+  <Step title="posthtmlMSO">
+    [posthtmlMSO](/development/tags#outlook) - `<outlook>` tags are replaced with the correct MSO comments
+  </Step>
+  
+  <Step title="purgeCSS">
+    [purgeCSS](/transformers/purge-css) - unused CSS is removed from `<style>` tags and HTML attributes
+  </Step>
+  
+  <Step title="templateTag">
+    [templateTag](/development/tags#template) - `<template>` tags are replaced with their content
+  </Step>
+  
+  <Step title="replaceStrings">
+    [replaceStrings](/transformers/replace-strings) - strings are replaced based on your config
+  </Step>
+  
+  <Step title="prettify">
+    [prettify](/transformers/prettify) - HTML is prettified
+  </Step>
+  
+  <Step title="minify">
+    [minify](/transformers/minify) - HTML is minified
+  </Step>
+</Steps>
+
+## afterTransformers()
+
+The [afterTransformers](/development/events#aftertransformers) event is triggered.
+
+## Plaintext
+
+A plaintext version is created at the [configured location](/development/plaintext#custom-path), if `plaintext` was enabled.
+
+## Write to disk
+
+The compiled HTML is saved at the [configured location](/configuration/build#path), with the [configured extension](/configuration/build#extension).
+
+## Copy static files
+
+All files and folders in `build.static.source` are copied to `build.static.destination`.
+
+## afterBuild()
+
+The [afterBuild](/development/events#afterbuild) event is triggered (CLI-only).

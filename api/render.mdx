@@ -1,0 +1,151 @@
+---
+title: render()
+description: The render() method for compiling HTML emails with Maizzle
+---
+
+# render()
+
+The `render()` method compiles a string to an HTML email.
+
+## Signature
+
+```js
+const { html, config } = await render(input, options)
+```
+
+### Parameters
+
+<ParamField path="input" type="string" required>
+  The HTML string to compile. Must include at least `<style> @tailwind utilities; </style>` inside the `<head>` for CSS to be output or inlined.
+</ParamField>
+
+<ParamField path="options" type="object">
+  Maizzle configuration object, like you would use in `config.js`. See [configuration](/api/configuration) for all available options.
+</ParamField>
+
+### Return value
+
+The method returns an object with the following properties:
+
+<ParamField path="html" type="string">
+  The compiled HTML email string
+</ParamField>
+
+<ParamField path="config" type="object">
+  The [Environment config](/concepts/environments) that was computed for this render
+</ParamField>
+
+## Examples
+
+### Basic usage
+
+```js app.js
+import { render } from '@maizzle/framework'
+
+const { html, config } = await render(`<!doctype html>
+<html>
+  <head>
+    <style>
+      @tailwind utilities;
+    </style>
+  </head>
+  <body>
+    <div class="p-4">Hello, world!</div>
+  </body>
+</html>`)
+
+console.log(html)
+```
+
+### With options
+
+```js app.js
+import { render } from '@maizzle/framework'
+import tailwindcssPresetEmail from 'tailwindcss-preset-email'
+
+const input = `<!doctype html>
+<html>
+  <head>
+    <style>
+      @tailwind utilities;
+    </style>
+  </head>
+  <body>
+    <div class="p-4 bg-blue-500 text-white">
+      Hello, world!
+    </div>
+  </body>
+</html>`
+
+const { html } = await render(input, {
+  css: {
+    inline: true,
+    purge: true,
+    shorthand: true,
+    tailwind: {
+      presets: [tailwindcssPresetEmail],
+      content: [
+        {
+          raw: input,
+          extension: 'html'
+        }
+      ]
+    }
+  }
+})
+
+console.log(html)
+```
+
+### With front matter
+
+```js app.js
+import { render } from '@maizzle/framework'
+
+let input = `---
+title: Hello, world!
+preheader: This is a preheader
+---
+
+<!doctype html>
+<html>
+  <head>
+    <style>
+      @tailwind utilities;
+    </style>
+  </head>
+  <body>
+    <div class="p-4">
+      {{ page.title }}
+    </div>
+  </body>
+</html>`
+
+const { html } = await render(input)
+
+console.log(html)
+```
+
+### With templating
+
+```js app.js
+import { render } from '@maizzle/framework'
+
+let html = `---
+title: Using Maizzle programmatically
+---
+
+<x-main>
+  <div class="p-4">
+    {{ page.title }}
+  </div>
+</x-main>`
+
+const { html: output } = await render(html)
+
+console.log(output)
+```
+
+<Warning>Paths to layouts or components in your string must be relative to the location where you execute the script.</Warning>
+
+<Warning>Component `x-` tags only work in Node.js and when the referenced files are available on disk.</Warning>

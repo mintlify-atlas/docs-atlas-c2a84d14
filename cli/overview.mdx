@@ -1,0 +1,67 @@
+---
+title: CLI overview
+description: Using the Maizzle CLI tool to scaffold projects and build emails
+---
+
+# Maizzle CLI
+
+You can use the Maizzle CLI to:
+
+- Create new projects
+- Generate config files
+- Build your HTML emails
+- Scaffold templates or layouts
+
+## Installation
+
+Install the CLI tool globally, so that the `maizzle` executable gets added to your `$PATH`:
+
+<CodeGroup>
+```sh npm
+npm install -g @maizzle/cli
+```
+
+```sh yarn
+yarn global add @maizzle/cli
+```
+
+```sh pnpm
+pnpm add -g @maizzle/cli
+```
+</CodeGroup>
+
+## Creating a project
+
+Scaffold a Maizzle project by opening a terminal and running:
+
+```sh
+maizzle new
+```
+
+This will bring up an interactive prompt that will guide you through the process.
+
+## Development
+
+The CLI tool provides commands for developing HTML emails with Maizzle.
+
+### serve
+
+Use the `maizzle serve` command to start a local development server, which you can access in your browser at http://localhost:3000.
+
+```sh
+maizzle serve [env]
+```
+
+You can edit a template or component in your code editor, save it, and the changes will instantly be reflected in the browser.
+
+### build
+
+The `build` command is used to compile your templates and output them to the destination directory.
+
+```sh
+maizzle build [env]
+```
+
+If `[env]` is specified, Maizzle will try to compute an environment config by merging `config.[env].js` on top of the default `config.js`.
+
+<Note>If no `[env]` is specified, Maizzle will use `config.js` from the current working directory.</Note>

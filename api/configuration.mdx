@@ -1,0 +1,196 @@
+---
+title: API configuration
+description: Configuration options for the Maizzle API
+---
+
+# API configuration
+
+When using the Maizzle API, you can pass configuration options to the `render()` method.
+
+The `options` parameter is an object with Maizzle configuration, like you would use in `config.js`.
+
+## Example
+
+```js app.js
+import { render } from '@maizzle/framework'
+
+const options = {
+  css: {
+    inline: true,
+    purge: true,
+    shorthand: true,
+  },
+  afterRender({html, config, matter}) {
+    // ...
+  },
+}
+
+const { html } = await render(`html string`, options)
+```
+
+## CSS options
+
+Configure how CSS is processed and optimized.
+
+### css.inline
+
+Inline CSS from `<style>` tags into `style` attributes.
+
+```js
+const options = {
+  css: {
+    inline: true,
+  },
+}
+```
+
+### css.purge
+
+Remove unused CSS from `<style>` tags.
+
+```js
+const options = {
+  css: {
+    purge: true,
+  },
+}
+```
+
+### css.shorthand
+
+Rewrite CSS properties to use shorthand syntax.
+
+```js
+const options = {
+  css: {
+    shorthand: true,
+  },
+}
+```
+
+### css.tailwind
+
+Pass a Tailwind CSS configuration object.
+
+```js
+import tailwindcssPresetEmail from 'tailwindcss-preset-email'
+
+const options = {
+  css: {
+    tailwind: {
+      presets: [tailwindcssPresetEmail],
+      content: [
+        {
+          raw: input,
+          extension: 'html'
+        }
+      ]
+    }
+  }
+}
+```
+
+<Note>
+The `content` key is required for Tailwind to know where to look for classes to generate. Otherwise your `<style>` tag will be empty and no CSS would be inlined.
+</Note>
+
+## Tailwind CSS
+
+When using the API, you might not have a `tailwind.config.js` file in the current directory.
+
+If a `tailwind.config.js` cannot be found in the current directory (where you execute the script), the default Tailwind CSS config will be used. In order to avoid this, you may pass your own Tailwind CSS config inside the `options` object.
+
+For example, let's use `tailwindcss-preset-email` when rendering templates programmatically:
+
+```js app.js
+import { render } from '@maizzle/framework'
+import tailwindcssPresetEmail from 'tailwindcss-preset-email'
+
+const input = `
+  <style>
+    @tailwind utilities;
+  </style>
+
+  <div class="p-2">Test</div>`
+
+const { html } = await render(input, {
+  css: {
+    tailwind: {
+      presets: [tailwindcssPresetEmail],
+      content: [
+        {
+          raw: input,
+          extension: 'html'
+        }
+      ]
+    }
+  }
+})
+```
+
+In order for Tailwind to actually generate CSS based on classes in your `input` string, you need to pass the `content` key with an array of objects that contain the raw content and the file extension.
+
+## Hooks
+
+You can use [event hooks](/events) in the API configuration to run custom logic at different stages of the rendering process.
+
+```js
+const options = {
+  afterRender({html, config, matter}) {
+    // Custom logic here
+    return html
+  },
+}
+```
+
+## Gotchas
+
+Since the options object that you can pass to the `render` method is optional, there are a few gotchas that you need to be aware of.
+
+### Tailwind config
+
+Maizzle will use the Tailwind CSS config object as-is, which means that if you just include the `content` key it will generate CSS with the default values like `rem` or CSS variables.
+
+In order to generate CSS optimized for HTML email, you need to fully configure Tailwind in the `css.tailwind` object. The simplest way to do this is to use a preset like `tailwindcss-preset-email`, as shown in the example above.
+
+### Default Tailwind
+
+If you don't specify a [Tailwind config object](#tailwind-css), Maizzle will try to compile Tailwind using `tailwind.config.js` at your current path.
+
+<Warning>
+If the file is not found, Tailwind CSS will be compiled with its [default config](https://github.com/tailwindlabs/tailwindcss/blob/master/stubs/config.full.js).
+</Warning>
+
+The default config is not optimized for HTML email: it uses units like `rem` and CSS properties that are used for web design and which have little to no support in the majority of email clients.
+
+Also, the default Tailwind config will not include any `content` paths that should be scanned for generating utility classes, meaning that the `<style>` tag in your email will be empty.
+
+### Transformers
+
+Most transformers, such as CSS inlining or minification, are opt-in: they transform content only when you enable them. Since you don't need to pass in a Maizzle config object, this means that most of them will not run.
+
+The following transformers always run:
+
+- Markdown (can be disabled)
+- Prevent widows
+- Remove attributes - removes empty `style` attributes by default
+- Filters - provides various [text filters](/transformers/filters)
+
+### CSS output
+
+You must add the `@tailwind` directives in a `<style>` tag in the `<head>` of your email HTML, otherwise Tailwind CSS will not be compiled.
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <style>
+      @tailwind components;
+      @tailwind utilities;
+    </style>
+  </head>
+  <body>
+    ...
+  </body>
+</html>
+```

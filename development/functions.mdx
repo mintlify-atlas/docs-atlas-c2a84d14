@@ -1,0 +1,52 @@
+---
+title: Functions
+description: Define functions in the config and use their output in your email templates
+---
+
+Maizzle is fully configured in JavaScript, so you can programmatically set config options or process and make data available to your Templates.
+
+## Defining functions
+
+When defining a function, you need to make sure that:
+
+<Steps>
+  <Step title="It returns something">
+    Functions must return a value to be used in templates.
+  </Step>
+  <Step title="You invoke it">
+    Make sure to call the function with `()` when assigning it to a config key.
+  </Step>
+</Steps>
+
+```js config.js
+import imaginaryLib from 'imaginary-lib'
+
+const foo = function() {
+  return 'manchu'
+}
+
+export default {
+  foo: foo(), // invoke function defined above
+  bar: function() {
+    // do stuff and return
+    return 'baz'
+  }(), // invoke function
+  wha: () => imaginaryLib.render('implicit return 👌')
+}
+```
+
+You would access those variables under the `page` object:
+
+```hbs emails/example.html
+<x-main>
+  {{ page.foo }}
+  {{ page.bar }}
+  {{ page.wha }}
+</x-main>
+```
+
+Result:
+
+```html build_production/example.html
+manchu baz implicit return 👌
+```

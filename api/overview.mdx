@@ -1,0 +1,104 @@
+---
+title: API overview
+description: Using the API to compile an HTML email styled with Tailwind CSS
+---
+
+# API
+
+Use the Maizzle API to compile a string to an HTML email.
+
+## Example
+
+```js app.js
+import { render } from '@maizzle/framework'
+import tailwindcssPresetEmail from 'tailwindcss-preset-email'
+
+let input = `---
+title: Hello, world!
+---
+
+<!doctype html>
+<html>
+  <head>
+    <style>
+      @tailwind components;
+      @tailwind utilities;
+    </style>
+  </head>
+  <body>
+    <div class="p-4 bg-blue-500 text-white">
+      {{ page.title }}
+    </div>
+  </body>
+</html>`
+
+const { html } = await render(input,
+  {
+    css: {
+      inline: true,
+      purge: true,
+      shorthand: true,
+      tailwind: {
+        presets: [tailwindcssPresetEmail],
+        content: [
+          {
+            raw: input,
+            extension: 'html'
+          }
+        ]
+      }
+    }
+  }
+)
+console.log(html)
+```
+
+Your `html` string must include at least `<style> @tailwind utilities; </style>` inside the `<head>`, otherwise no CSS will be output or inlined.
+
+Notice also the `css.tailwind` config.
+
+The `content` key is needed for Tailwind to know where to look for classes to generate - otherwise your `<style>` tag will be empty and no CSS would be inlined either.
+
+We also pass a `presets` array with the `tailwindcss-preset-email` package, which configures Tailwind to output CSS values optimized for HTML email.
+
+## Usage
+
+First, import the `render` method in your application:
+
+```js app.js
+import { render } from '@maizzle/framework'
+```
+
+<Note>Use object destructuring so that you don't import all the other methods from Maizzle, like `serve`.</Note>
+
+Then, call it with two parameters: the HTML string to compile and a Maizzle config object.
+
+```js app.js
+import { render } from '@maizzle/framework'
+
+const options = {
+  // Maizzle config object
+}
+
+const { html, config } = await render(`html string`, options)
+```
+
+The `render` method returns an object containing the compiled HTML and the [Environment config](/concepts/environments) that was computed for it.
+
+## Templating
+
+Of course, templating tags are available when using Maizzle programmatically.
+
+```js app.js
+let html = `---
+title: Using Maizzle programmatically
+---
+
+<x-main>
+  <!-- your email HTML... -->
+</x-main>`
+```
+
+<Warning>Paths to layouts or components in your string must be relative to the location where you execute the script.</Warning>
+
+<Warning>Component `x-` tags only work in Node.js and when the referenced files are available on disk.</Warning>

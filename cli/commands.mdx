@@ -1,0 +1,356 @@
+---
+title: CLI commands
+description: All available Maizzle CLI commands for building emails and scaffolding files
+---
+
+# CLI commands
+
+## Development commands
+
+### serve
+
+Start a local development server with hot-reloading.
+
+```sh
+maizzle serve [env]
+```
+
+<ParamField path="env" type="string" default="local">
+  An [Environment](/concepts/environments) name to use
+</ParamField>
+
+#### Options
+
+<ParamField path="--bin" type="string">
+  Short: `-b`
+  
+  Path to the Maizzle executable
+</ParamField>
+
+<ParamField path="--config" type="string">
+  Short: `-c`
+  
+  Path to a config file to use
+</ParamField>
+
+<ParamField path="--port" type="number" default="3000">
+  Short: `-p`
+  
+  Port number to run the server on
+</ParamField>
+
+#### Examples
+
+Serve with a specific environment:
+
+```sh
+maizzle serve production
+```
+
+This will start a local development server using the settings from your project's `config.production.js`.
+
+Serve with a custom config file:
+
+```sh
+maizzle serve production --config /path/to/dev.config.js
+```
+
+The config file path takes precedence over the `[env]` argument, so `dev.config.js` will be used even if `production` is passed.
+
+Serve on a custom port:
+
+```sh
+maizzle serve --port 8080
+```
+
+Specify path to Maizzle executable:
+
+```sh
+maizzle serve --bin /path/to/@maizzle/framework/src
+```
+
+### build
+
+Compile your templates and output them to the destination directory.
+
+```sh
+maizzle build [env]
+```
+
+<ParamField path="env" type="string" default="local">
+  An environment name to use
+</ParamField>
+
+#### Options
+
+<ParamField path="--bin" type="string">
+  Short: `-b`
+  
+  Path to the Maizzle executable
+</ParamField>
+
+<ParamField path="--config" type="string">
+  Short: `-c`
+  
+  Path to a config file to use. The environment config will be computed based exclusively on the contents of the specified file, there will be no merging with `config.js`.
+</ParamField>
+
+<ParamField path="--summary" type="boolean">
+  Short: `-s`
+  
+  Show a summary of the build process
+</ParamField>
+
+#### Examples
+
+Build with a specific environment:
+
+```sh
+maizzle build production
+```
+
+Build with a custom config file:
+
+```sh
+maizzle build --config /path/to/custom-config.js
+```
+
+Specifying a config file path takes precedence over the `[env]` argument. In this example, `custom-config.js` will be used even if `production` is passed:
+
+```sh
+maizzle build production --config /path/to/custom-config.js
+```
+
+Build with a summary:
+
+```sh
+maizzle build production --summary
+```
+
+This will output a list of all the templates that were built, their compiled file size, and how long it took to build each one:
+
+```md
+┌────────────────────────┬───────────┬────────────┐
+│ File name              │ File size │ Build time │
+├────────────────────────┼───────────┼────────────┤
+│ confirmation.html      │ 5.07 KB   │ 432 ms     │
+├────────────────────────┼───────────┼────────────┤
+│ email-change.html      │ 5.07 KB   │ 79 ms      │
+├────────────────────────┼───────────┼────────────┤
+│ invitation.html        │ 5.08 KB   │ 81 ms      │
+├────────────────────────┼───────────┼────────────┤
+│ password-recovery.html │ 4.99 KB   │ 65 ms      │
+└────────────────────────┴───────────┴────────────┘
+
+✔ Built 4 templates in 698 ms
+```
+
+## Scaffolding commands
+
+CLI commands for creating new projects and scaffolding templates or config files.
+
+### make:config
+
+Create a new Maizzle config file.
+
+```sh
+maizzle make:config [env]
+```
+
+This command will start an interactive prompt that will guide you through the process of creating a new Maizzle config file.
+
+<ParamField path="env" type="string">
+  Environment name to use for the config file name
+</ParamField>
+
+#### Options
+
+<ParamField path="--full" type="boolean">
+  Short: `-f`
+  
+  Scaffold a full config instead of a minimal one
+</ParamField>
+
+#### Examples
+
+Create a minimal config file:
+
+```sh
+maizzle make:config preview
+```
+
+This will output `config.preview.js`:
+
+```js config.preview.js
+/** @type {import('@maizzle/framework').Config} */
+export default {
+  build: {
+    content: ['emails/**/*.html'],
+    output: {
+      path: 'build_preview',
+    },
+  },
+}
+```
+
+Create a full config file:
+
+```sh
+maizzle make:config preview --full
+```
+
+### make:layout
+
+Scaffold a new layout.
+
+```sh
+maizzle make:layout [filepath]
+```
+
+Running it with no arguments will present an interactive prompt.
+
+<ParamField path="filepath" type="string">
+  Full path of the file to create, including file name
+</ParamField>
+
+<Warning>If the file already exists, an error will be thrown. The file will not be overwritten.</Warning>
+
+#### Examples
+
+Create a layout:
+
+```sh
+maizzle make:layout layouts/layout.html
+```
+
+Paths may be relative to the project root:
+
+```sh
+maizzle make:layout ../global-emails/layouts/layout.html
+```
+
+### make:template
+
+Scaffold a new template.
+
+```sh
+maizzle make:template [filepath]
+```
+
+Running it with no arguments will present an interactive prompt.
+
+<ParamField path="filepath" type="string">
+  Full path of the file to create, including file name
+</ParamField>
+
+<Warning>If the file already exists, an error will be thrown. The file will not be overwritten.</Warning>
+
+A minimal template structure will be output:
+
+```html emails/my-template.html
+---
+preheader: "Sample preheader text"
+---
+
+<x-main>
+  <!-- your HTML... -->
+</x-main>
+```
+
+#### Examples
+
+Create a template:
+
+```sh
+maizzle make:template emails/my-template.html
+```
+
+Paths may be relative to the project root:
+
+```sh
+maizzle make:template ../global-emails/my-template.html
+```
+
+### make:component
+
+Scaffold a new component.
+
+```sh
+maizzle make:component [filepath]
+```
+
+Running it with no arguments will present an interactive prompt.
+
+<ParamField path="filepath" type="string">
+  Full path of the file to create, including file name
+</ParamField>
+
+<Warning>If the file already exists, an error will be thrown. The file will not be overwritten.</Warning>
+
+A minimal component structure will be output:
+
+```html components/my-component.html
+<script props>
+  module.exports = {
+    greeting: props.greeting || 'Hello, World!',
+  }
+</script>
+
+{{ greeting }}
+
+<yield />
+```
+
+#### Examples
+
+Create a component:
+
+```sh
+maizzle make:component components/my-component.html
+```
+
+Paths may be relative to the project root:
+
+```sh
+maizzle make:component ../global-emails/components/my-component.html
+```
+
+### make:tailwind
+
+Scaffold a new Tailwind CSS config.
+
+```sh
+maizzle make:tailwind [filepath]
+```
+
+Running it with no arguments will present an interactive prompt.
+
+<ParamField path="filepath" type="string">
+  Full path of the file to create, including file name
+</ParamField>
+
+<Warning>If the file already exists, an error will be thrown. The file will not be overwritten.</Warning>
+
+A minimal Tailwind CSS config will be output based on the one in the [Starter](https://github.com/maizzle/maizzle/blob/master/tailwind.config.js):
+
+```js tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  presets: [
+    require('tailwindcss-preset-email'),
+  ],
+  content: [
+    './components/**/*.html',
+    './emails/**/*.html',
+    './layouts/**/*.html',
+  ],
+}
+```
+
+#### Examples
+
+Create a Tailwind config:
+
+```sh
+maizzle make:tailwind config/tailwind.config.js
+```
